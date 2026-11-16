@@ -1,5 +1,5 @@
-[*] source 10.77.7.2:0 -> 192.168.2.42:8081  mode=race
-[*] race: victim 192.168.2.42:8081 backlog=8 batch=1 dur=1200s gaps=20/0/0 +/-2us
+[*] source 10.0.0.2:0 -> 10.0.0.10:8081  mode=race
+[*] race: victim 10.0.0.10:8081 backlog=8 batch=1 dur=1200s gaps=20/0/0 +/-2us
 [*]   0.5s attempts=1024 cookies=1024 bursts=1024
 [*]   1.0s attempts=2048 cookies=2048 bursts=2048
 [*]   1.5s attempts=3072 cookies=3072 bursts=3072
