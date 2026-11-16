@@ -1,0 +1,37 @@
+/*
+ * aba3.bt - address reuse check without BTF / without __reqsk_free.
+ * __inet_csk_reqsk_queue_drop(sk, req) is what our in-window RST triggers; the
+ * cookie ACK then calls inet_reqsk_alloc().  If the alloc returns the address
+ * that was just dropped, the slab slot was reused - the ABA precondition.
+ */
+kprobe:__inet_csk_reqsk_queue_drop
+{
+	@dropped[(uint64)arg1] = nsecs;
+	@dropped_cpu[(uint64)arg1] = cpu;
+	@drops = count();
+}
+
+kretprobe:inet_reqsk_alloc
+{
+	$r = (uint64)retval;
+	if ($r != 0) {
+		@allocs = count();
+		if (@dropped[$r] != 0) {
+			@aba_us = hist(((uint64)(nsecs - @dropped[$r])) / 1000);
+			if (@dropped_cpu[$r] == cpu) {
+				@aba_same_cpu = count();
+			} else {
+				@aba_other_cpu = count();
+			}
+			delete(@dropped[$r]);
+			delete(@dropped_cpu[$r]);
+		}
+	}
+}
+
+interval:s:5
+{
+	printf("drops=%llu allocs=%llu aba_same_cpu=%llu aba_other_cpu=%llu\n",
+	       (uint64)@drops, (uint64)@allocs, (uint64)@aba_same_cpu,
+	       (uint64)@aba_other_cpu);
+}

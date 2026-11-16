@@ -1,0 +1,35 @@
+diag3: conn_request / cookie / hash_add / drops
+Attached 7 probes
+conn_req=0 cookie_sent=0 hash_add=0 queue_drop=0 lookup_found_req=0
+/poc/diag3.bt:19:17-26: WARNING: No error information
+Additional Info - helper: map_lookup_percpu_elem, retcode: 0
+           (uint64)@conn_req, (uint64)@cookie_sent, (uint64)@hash_add,
+                   ~~~~~~~~~
+/poc/diag3.bt:19:36-48: WARNING: No error information
+Additional Info - helper: map_lookup_percpu_elem, retcode: 0
+           (uint64)@conn_req, (uint64)@cookie_sent, (uint64)@hash_add,
+                                      ~~~~~~~~~~~~
+/poc/diag3.bt:19:58-67: WARNING: No error information
+Additional Info - helper: map_lookup_percpu_elem, retcode: 0
+           (uint64)@conn_req, (uint64)@cookie_sent, (uint64)@hash_add,
+                                                            ~~~~~~~~~
+/poc/diag3.bt:20:17-28: WARNING: No error information
+Additional Info - helper: map_lookup_percpu_elem, retcode: 0
+           (uint64)@queue_drop, (uint64)@lookup_found_req);
+                   ~~~~~~~~~~~
+/poc/diag3.bt:20:38-55: WARNING: No error information
+Additional Info - helper: map_lookup_percpu_elem, retcode: 0
+           (uint64)@queue_drop, (uint64)@lookup_found_req);
+                                        ~~~~~~~~~~~~~~~~~
+conn_req=57268 cookie_sent=11335 hash_add=45933 queue_drop=45929 lookup_found_req=69424
+conn_req=134882 cookie_sent=26721 hash_add=108161 queue_drop=108155 lookup_found_req=163553
+conn_req=219091 cookie_sent=90534 hash_add=128545 queue_drop=128532 lookup_found_req=194211
+conn_req=315468 cookie_sent=186911 hash_add=128545 queue_drop=128532 lookup_found_req=194241
+conn_req=342292 cookie_sent=213734 hash_add=128546 queue_drop=128533 lookup_found_req=194242
+
+
+@conn_req: 342292
+@cookie_sent: 213734
+@hash_add: 128546
+@lookup_found_req: 194242
+@queue_drop: 128533

@@ -1,0 +1,15 @@
+# kernel module build artefacts
+*.ko
+*.o
+*.mod
+*.mod.c
+*.symvers
+*.order
+.*.cmd
+.tmp_versions/
+
+# run output
+results/*.tmp
+results/kmsg.log
+__pycache__/
+*.pyc

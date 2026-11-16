@@ -1,0 +1,51 @@
+name: noisytcp-lab
+
+# Lab for CVE-2026-99288 ("NoisyTCP"): pre-auth remote corruption in the Linux
+# TCP stack reached through a stale ehash lookup + SYN-cookie request reuse.
+# Everything runs inside the Docker Desktop Linux VM; the kernel is the target.
+
+services:
+  victim:
+    build: ./victim
+    privileged: true
+    sysctls:
+      - net.ipv4.tcp_syncookies=1
+    networks:
+      noisy:
+        ipv4_address: 10.213.99.10
+
+  attacker:
+    build: ./attacker
+    privileged: true
+    volumes:
+      - ./results:/out
+    networks:
+      noisy:
+        ipv4_address: 10.213.99.20
+    # The attacker kernel answers the victim's SYN-ACKs with RSTs; that would
+    # tear down exactly the half-open request sockets we are racing against.
+    # Drop them, but keep our own crafted (marked) RSTs.
+    command:
+      - "-c"
+      - >-
+        iptables -A OUTPUT -p tcp --tcp-flags RST RST -m mark ! --mark 0x1 -j DROP &&
+        echo "[attacker] RST suppression: $(iptables -S OUTPUT | grep RST || true)" &&
+        tail -f /dev/null
+
+  monitor:
+    image: alpine:latest
+    privileged: true
+    volumes:
+      - ./results:/out
+    command:
+      - "sh"
+      - "-c"
+      - >-
+        while true; do cat /dev/kmsg 2>/dev/null; done >> /out/kmsg.log
+
+networks:
+  noisy:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.213.99.0/24

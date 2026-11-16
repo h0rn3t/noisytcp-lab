@@ -1,0 +1,21 @@
+/* diag3.bt - where do the control SYNs go? */
+BEGIN { printf("diag3: conn_request / cookie / hash_add / drops\n"); }
+
+kprobe:tcp_conn_request { @conn_req = count(); }
+kprobe:__cookie_v4_init_sequence { @cookie_sent = count(); }
+kretprobe:inet_csk_reqsk_queue_hash_add { @hash_add = count(); }
+kprobe:__inet_csk_reqsk_queue_drop { @queue_drop = count(); }
+kretprobe:__inet_lookup_established
+{
+	$sk = (struct sock *)retval;
+	if ($sk != 0 && $sk->__sk_common.skc_state == 12) {
+		@lookup_found_req = count();
+	}
+}
+
+interval:s:2
+{
+	printf("conn_req=%llu cookie_sent=%llu hash_add=%llu queue_drop=%llu lookup_found_req=%llu\n",
+	       (uint64)@conn_req, (uint64)@cookie_sent, (uint64)@hash_add,
+	       (uint64)@queue_drop, (uint64)@lookup_found_req);
+}

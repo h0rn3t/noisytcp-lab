@@ -1,0 +1,69 @@
+/*
+ * aba.bt - non-destructive instrumentation for the NoisyTCP window.
+ *
+ *   docker compose exec attacker sh -c \
+ *     'mount -t tracefs tracefs /sys/kernel/tracing; bpftrace /poc/aba.bt'
+ *
+ * Counters:
+ *   @aba_same_cpu          request_sock slab slot freed and reallocated by the
+ *                          next inet_reqsk_alloc() on the same CPU (LIFO ABA)
+ *   @unhashed              __inet_lookup_established() returned a socket in
+ *                          TCP_NEW_SYN_RECV whose ehash node is already unhashed
+ *   @unhashed_null_listener  ... and that socket has rsk_listener == NULL:
+ *                          the exact object tcp_v4_rcv() dereferences into a
+ *                          kernel panic.  If this fires, the box is already
+ *                          dead, the counters just may not reach userspace.
+ */
+
+BEGIN
+{
+	printf("tracing request_sock reuse (CVE-2026-99288 window)...\n");
+}
+
+kprobe:__reqsk_free
+{
+	@freed[(uint64)arg0] = nsecs;
+	@freed_cpu[(uint64)arg0] = cpu;
+	@frees = count();
+}
+
+kretprobe:inet_reqsk_alloc
+{
+	$req = (uint64)retval;
+	if ($req != 0) {
+		$t = @freed[$req];
+		if ($t != 0) {
+			$delta = ((uint64)(nsecs - $t)) / 1000;
+			@aba_us = hist($delta);
+			if (@freed_cpu[$req] == cpu) {
+				@aba_same_cpu = count();
+			} else {
+				@aba_other_cpu = count();
+			}
+			delete(@freed[$req]);
+			delete(@freed_cpu[$req]);
+		}
+		@allocs = count();
+	}
+}
+
+kretprobe:__inet_lookup_established
+{
+	$sk = (struct sock *)retval;
+	if ($sk != 0 && $sk->__sk_common.skc_state == 12) {
+		if ($sk->__sk_common.skc_nulls_node.pprev == 0) {
+			@unhashed = count();
+			if ($sk->__sk_common.skc_listener == 0) {
+				@unhashed_null_listener = count();
+				printf("*** CRASH PRECURSOR: lookup returned unhashed request with NULL listener %p\n", $sk);
+			}
+		}
+	}
+}
+
+interval:s:5
+{
+	printf("frees=%llu aba_same_cpu=%llu aba_other_cpu=%llu unhashed=%llu null_listener=%llu\n",
+	       (uint64)@frees, (uint64)@aba_same_cpu, (uint64)@aba_other_cpu,
+	       (uint64)@unhashed, (uint64)@unhashed_null_listener);
+}

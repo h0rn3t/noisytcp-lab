@@ -1,0 +1,68 @@
+[*] source 10.77.7.2:0 -> 192.168.2.42:8081  mode=race
+[*] race: victim 192.168.2.42:8081 backlog=1 batch=8 dur=3600s gaps=20/0/0 +/-2us
+[*]   5.4s attempts=7771 cookies=7771 bursts=7771
+[*]  12.9s attempts=15361 cookies=15361 bursts=15361
+[*]  19.4s attempts=23167 cookies=23167 bursts=23167
+[*]  26.0s attempts=30903 cookies=30903 bursts=30903
+[*]  33.4s attempts=38531 cookies=38531 bursts=38531
+[*]  40.6s attempts=46236 cookies=46236 bursts=46236
+[*]  47.2s attempts=53982 cookies=53982 bursts=53982
+[*]  54.6s attempts=61600 cookies=61600 bursts=61600
+[*]  60.6s attempts=69378 cookies=69378 bursts=69378
+[*]  67.4s attempts=77104 cookies=77104 bursts=77104
+[*]  74.7s attempts=84797 cookies=84797 bursts=84797
+[*]  81.2s attempts=92544 cookies=92544 bursts=92544
+[*]  87.2s attempts=100358 cookies=100358 bursts=100358
+[*]  94.2s attempts=108093 cookies=108093 bursts=108093
+[*] 101.3s attempts=115765 cookies=115765 bursts=115765
+[*] 107.9s attempts=123556 cookies=123556 bursts=123556
+[*] 116.5s attempts=130968 cookies=130968 bursts=130968
+[*] 128.5s attempts=137859 cookies=137859 bursts=137859
+sendto: Operation not permitted (errno 1)
+sendto: Operation not permitted (errno 1)
+sendto: Operation not permitted (errno 1)
+[*] 140.5s attempts=144847 cookies=144847 bursts=144847
+sendto: Operation not permitted (errno 1)
+[*] 152.4s attempts=151718 cookies=151718 bursts=151718
+[*] 164.2s attempts=158626 cookies=158626 bursts=158626
+sendto: Operation not permitted (errno 1)
+[*] 175.4s attempts=165606 cookies=165606 bursts=165606
+[*] 185.1s attempts=172815 cookies=172815 bursts=172815
+[*] 194.8s attempts=180099 cookies=180099 bursts=180099
+[*] 204.3s attempts=187367 cookies=187367 bursts=187367
+[*] 215.2s attempts=194320 cookies=194320 bursts=194320
+sendto: Operation not permitted (errno 1)
+[*] 225.8s attempts=201374 cookies=201374 bursts=201374
+sendto: Operation not permitted (errno 1)
+[*] 236.6s attempts=208518 cookies=208518 bursts=208518
+sendto: Operation not permitted (errno 1)
+[*] 246.9s attempts=215615 cookies=215615 bursts=215615
+sendto: Operation not permitted (errno 1)
+[*] 257.5s attempts=222612 cookies=222612 bursts=222612
+sendto: Operation not permitted (errno 1)
+sendto: Operation not permitted (errno 1)
+sendto: Operation not permitted (errno 1)
+sendto: Operation not permitted (errno 1)
+[*] 267.4s attempts=229742 cookies=229742 bursts=229742
+sendto: Operation not permitted (errno 1)
+[*] 277.9s attempts=236818 cookies=236818 bursts=236818
+sendto: Operation not permitted (errno 1)
+[*] 288.5s attempts=243929 cookies=243929 bursts=243929
+sendto: Operation not permitted (errno 1)
+[*] 299.5s attempts=250842 cookies=250842 bursts=250842
+[*] 309.7s attempts=257862 cookies=257862 bursts=257862
+[*] 321.2s attempts=264809 cookies=264809 bursts=264809
+[*] 332.5s attempts=271713 cookies=271713 bursts=271713
+[*] 343.3s attempts=278704 cookies=278704 bursts=278704
+[*] 354.0s attempts=285718 cookies=285718 bursts=285718
+[*] 363.5s attempts=292965 cookies=292965 bursts=292965
+sendto: Operation not permitted (errno 1)
+[*] 373.5s attempts=300135 cookies=300135 bursts=300135
+sendto: Operation not permitted (errno 1)
+sendto: Operation not permitted (errno 1)
+sendto: Operation not permitted (errno 1)
+[*] 384.5s attempts=307139 cookies=307139 bursts=307139
+[*] 397.5s attempts=313507 cookies=313507 bursts=313507
+sendto: Operation not permitted (errno 1)
+sendto: Operation not permitted (errno 1)
+[*] 407.1s attempts=320637 cookies=320637 bursts=320637

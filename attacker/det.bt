@@ -1,0 +1,37 @@
+/*
+ * det.bt - does the lookup actually find the hashed request socket, and does it
+ * ever return one that is already unhashed?
+ *
+ * No BTF on this kernel, so fields are read through raw integer casts:
+ *   +0x12  skc_state          (TCP_NEW_SYN_RECV == 12, same offset as the
+ *                              NULL-pointer address 0x12 in the advisory)
+ *   +0x70  skc_nulls_node.pprev  (hlist_nulls_unhashed == NULL)
+ */
+kprobe:__inet_lookup_established
+{
+	@all = count();
+}
+
+kretprobe:__inet_lookup_established
+{
+	$sk = (uint64)retval;
+	if ($sk != 0) {
+		@lookups = count();
+		if (*(uint8 *)($sk + 0x12) == 12) {
+			@s12 = count();
+			if (*(uint64 *)($sk + 0x70) == 0) {
+				@unhashed = count();
+				if (*(uint64 *)($sk + 0x60) == 0) {
+					@null_listener = count();
+				}
+			}
+		}
+	}
+}
+
+interval:s:5
+{
+	printf("all=%llu ret_nonnull=%llu state12=%llu unhashed=%llu null_listener=%llu\n",
+	       (uint64)@all, (uint64)@lookups, (uint64)@s12, (uint64)@unhashed,
+	       (uint64)@null_listener);
+}

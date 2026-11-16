@@ -1,0 +1,37 @@
+/*
+ * aba2.bt - address-only ABA check (works without BTF):
+ * is a request_sock slab slot, freed by __reqsk_free, handed back to the next
+ * inet_reqsk_alloc() (and on which CPU)?
+ */
+kprobe:__reqsk_free
+{
+	@freed[(uint64)arg0] = nsecs;
+	@freed_cpu[(uint64)arg0] = cpu;
+	@frees = count();
+}
+
+kretprobe:inet_reqsk_alloc
+{
+	$r = (uint64)retval;
+	if ($r != 0) {
+		@allocs = count();
+		$t = @freed[$r];
+		if ($t != 0) {
+			@aba_us = hist(((uint64)(nsecs - $t)) / 1000);
+			if (@freed_cpu[$r] == cpu) {
+				@aba_same_cpu = count();
+			} else {
+				@aba_other_cpu = count();
+			}
+			delete(@freed[$r]);
+			delete(@freed_cpu[$r]);
+		}
+	}
+}
+
+interval:s:5
+{
+	printf("frees=%llu allocs=%llu aba_same_cpu=%llu aba_other_cpu=%llu\n",
+	       (uint64)@frees, (uint64)@allocs, (uint64)@aba_same_cpu,
+	       (uint64)@aba_other_cpu);
+}

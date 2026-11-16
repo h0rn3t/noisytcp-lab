@@ -1,0 +1,28 @@
+/* diag.bt - is the lookup packet actually finding the hashed request socket? */
+BEGIN { printf("diag: lookup outcomes + fragment reassembly\n"); }
+
+kretprobe:__inet_lookup_established
+{
+	$sk = (struct sock *)retval;
+	@lookups = count();
+	if ($sk == 0) {
+		@null = count();
+	} else {
+		@state[$sk->__sk_common.skc_state] = count();
+		if ($sk->__sk_common.skc_state == 12) {
+			@found_new_syn_recv = count();
+		}
+	}
+}
+
+kprobe:ip_defrag
+{
+	@defrag = count();
+}
+
+interval:s:2
+{
+	printf("lookups=%llu null=%llu new_syn_recv=%llu defrag=%llu\n",
+	       (uint64)@lookups, (uint64)@null, (uint64)@found_new_syn_recv,
+	       (uint64)@defrag);
+}

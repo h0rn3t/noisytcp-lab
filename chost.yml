@@ -1,0 +1,29 @@
+name: noisytcp-host
+
+# Victim = the host itself (rpi400): the attacker container targets the host's
+# own sshd on :22, so the TCP stack that gets corrupted is the host kernel.
+# The bridge has IP masquerade disabled, so the crafted packets keep the
+# attacker's source address and seuqences are not rewritten by NAT.
+
+services:
+  attacker:
+    build: ./attacker
+    privileged: true
+    volumes:
+      - ./results:/out
+    networks:
+      - hv
+    command:
+      - "-c"
+      - >-
+        iptables -A OUTPUT -p tcp --tcp-flags RST RST -m mark ! --mark 0x1 -j DROP;
+        echo "[attacker] ready"; tail -f /dev/null
+
+networks:
+  hv:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+    ipam:
+      config:
+        - subnet: 10.77.7.0/24
